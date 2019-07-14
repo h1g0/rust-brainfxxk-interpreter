@@ -65,27 +65,27 @@ impl Token{
         return (start_end_map, end_start_map);
     }
 
-    //fn for token '+'.
+    //fn for token `+`.
     fn inc_mem_val(memory :&mut Vec<u32>, memory_ptr:u16){
         if let Some(val) = memory.get_mut(memory_ptr as usize) {
             *val += 1;
         }
     }
-    //fn for token '-'.
+    //fn for token `-`.
     fn dec_mem_val(memory :&mut Vec<u32>, memory_ptr:u16){
         if let Some(val) = memory.get_mut(memory_ptr as usize) {
             *val -= 1;
         }
     }
-    //fn for token '>'.
+    //fn for token `>`.
     fn inc_mem_ptr(memory_ptr:&mut u16){
         *memory_ptr +=1;
     }
-    //fn for token '<'.
+    //fn for token `<`.
     fn dec_mem_ptr(memory_ptr:&mut u16){
         *memory_ptr -=1;
     }
-    //fn for token '['.
+    //fn for token `[`.
     fn jump_loop_end_token_if_mem_0(mem_val:Option<&u32>, 
                                     loop_start_end_token_ptr_map:&HashMap<u32,u32>, 
                                     token_ptr : &mut u32){
@@ -99,7 +99,7 @@ impl Token{
             panic!("no pair ']' token found.");
         }
     }
-    //fn for token ']'.
+    //fn for token `]`.
     fn jump_loop_start_token_if_mem_not_0(mem_val:Option<&u32>, 
                                           loop_end_start_token_ptr_map:&HashMap<u32,u32>, 
                                           token_ptr : &mut u32){
@@ -113,7 +113,7 @@ impl Token{
             panic!("no pair '[' token found.");
         }
     }
-    //fn for token ','.
+    //fn for token `,`.
     fn put_char_from_input_to_mem(input_char_array:&mut VecDeque<char>,
                                   memory :&mut Vec<u32>, memory_ptr:u16){
         if let Some(val) = memory.get_mut(memory_ptr as usize){
@@ -123,7 +123,7 @@ impl Token{
         }
 
     }
-    //fn for token '.'.
+    //fn for token `.`.
     fn join_output_char_to_str(output_char:Option<char>, output_str:&mut String){
         if let Some(c) = output_char{
             output_str.push(c);
@@ -152,7 +152,7 @@ impl BfInterpreter{
             token_array : ta,
             token_ptr : 0,
             //Brainf*ck's number of memory cell is defined to be larger than 30,000.
-            //So this program should reserve size of u16::max_value(), 
+            //So this program should reserve size of `u16::max_value()`, 
             //which is expected to be 2^16 = 65,536.
             memory : vec![0 ; u16::max_value() as usize],
             memory_ptr : 0,
@@ -210,6 +210,10 @@ impl BfInterpreter{
             self.token_ptr += 1;
         }
     }
+
+    fn output(&self)->&str{
+        return &self.output;
+    }
 }
 
 fn main (){
@@ -219,5 +223,5 @@ fn main (){
     let input : &str = "";
     let mut  bf = BfInterpreter::init(src, input);
     bf.exec();
-    println!("{}",bf.output);
+    println!("{}",bf.output());
 }
