@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 use std::collections::HashMap;
-enum TokenType {
+enum Token {
     Inc,
     Dec,
     IncPtr,
@@ -11,32 +11,32 @@ enum TokenType {
     Output,
 }
 
-impl TokenType{
-    fn tokenize(c:char) -> Option<TokenType>{
+impl Token{
+    fn tokenize(c:char) -> Option<Token>{
         match c{
-            '+' => Some(TokenType::Inc),
-            '-' => Some(TokenType::Dec),
-            '>' => Some(TokenType::IncPtr),
-            '<' => Some(TokenType::DecPtr),
-            '[' => Some(TokenType::StartLoop),
-            ']' => Some(TokenType::EndLoop),
-            ',' => Some(TokenType::Input),
-            '.' => Some(TokenType::Output),
+            '+' => Some(Token::Inc),
+            '-' => Some(Token::Dec),
+            '>' => Some(Token::IncPtr),
+            '<' => Some(Token::DecPtr),
+            '[' => Some(Token::StartLoop),
+            ']' => Some(Token::EndLoop),
+            ',' => Some(Token::Input),
+            '.' => Some(Token::Output),
              _  => None,
         }
     }
 
-    fn tokenize_from_array(char_array: Vec<char>)->Vec<TokenType>{
-        let mut token_array: Vec<TokenType> = Vec::new();
+    fn tokenize_from_array(char_array: Vec<char>)->Vec<Token>{
+        let mut token_array: Vec<Token> = Vec::new();
         for c in char_array{
-            if let Some(token) = TokenType::tokenize(c){
+            if let Some(token) = Token::tokenize(c){
                 token_array.push(token);
             }
         }
         return token_array;
     }
 
-    fn get_loop_token_ptr(token_array:&Vec<TokenType>)->
+    fn get_loop_token_ptr(token_array:&Vec<Token>)->
                          (HashMap<u32,u32>,HashMap<u32,u32>){
         let mut start_end_map : HashMap<u32,u32> = HashMap::new();
         let mut end_start_map : HashMap<u32,u32> = HashMap::new();
@@ -44,10 +44,10 @@ impl TokenType{
         let mut ptr : u32 = 0;
         for token in token_array{
             match *token{
-                TokenType::StartLoop => {
+                Token::StartLoop => {
                     start_ptr_stack.push(ptr);
                 },
-                TokenType::EndLoop => {
+                Token::EndLoop => {
                     if let Some(start_ptr) = start_ptr_stack.pop(){
                         start_end_map.insert(start_ptr, ptr);
                         end_start_map.insert(ptr, start_ptr);
@@ -63,89 +63,6 @@ impl TokenType{
             panic!("Too many '[' tokens detected!");
         }
         return (start_end_map, end_start_map);
-    }
-}
-
-
-struct BfInterpreter{
-    token_array : Vec<TokenType>,
-    token_ptr : u32,
-    memory : Vec<u32>,
-    memory_ptr: u16,
-    input : VecDeque<char>,
-    output : String,
-    loop_start_end_token_ptr_map : HashMap<u32,u32>,
-    loop_end_start_token_ptr_map : HashMap<u32,u32>,
-}
-
-impl BfInterpreter{
-    fn init(src: &str, input: &str) -> BfInterpreter {
-        let ta = TokenType::tokenize_from_array(src.chars().collect::<Vec<char>>());
-        let (lsetpm,lestpm) = TokenType::get_loop_token_ptr(&ta);
-
-        BfInterpreter{
-            token_array : ta,
-            token_ptr : 0,
-            //Brainf*ck's number of memory cell is defined to be larger than 30,000.
-            //So this program should reserve size of u16::max_value(), 
-            //which is expected to be 2^16 = 65,536.
-            memory : vec![0 ; u16::max_value() as usize],
-            memory_ptr : 0,
-            input : input.chars().collect(),
-            output : String::from(""),
-            loop_start_end_token_ptr_map : lsetpm,
-            loop_end_start_token_ptr_map : lestpm,
-        }
-    }
-
-
-    fn exec(&mut self){
-        let token_array = &self.token_array;
-        self.token_ptr = 0;
-        while let Some(token) = token_array.get(self.token_ptr as usize){
-            match *token{
-                TokenType::Inc => {
-                    BfInterpreter::inc_mem_val(&mut self.memory, self.memory_ptr);
-                }
-                TokenType::Dec => {
-                    BfInterpreter::dec_mem_val(&mut self.memory, self.memory_ptr);
-                }
-                TokenType::IncPtr => {
-                    BfInterpreter::inc_mem_ptr(&mut self.memory_ptr);
-                }
-                TokenType::DecPtr => {
-                    BfInterpreter::dec_mem_ptr(&mut self.memory_ptr);
-                }
-                TokenType::StartLoop => {
-                    BfInterpreter::jump_loop_end_token_if_mem_0(
-                        self.memory.get(self.memory_ptr as usize),
-                        &self.loop_start_end_token_ptr_map,
-                        &mut self.token_ptr
-                        );
-                }
-                TokenType::EndLoop => {
-                    BfInterpreter::jump_loop_start_token_if_mem_not_0(
-                        self.memory.get(self.memory_ptr as usize),
-                        &self.loop_end_start_token_ptr_map,
-                        &mut self.token_ptr
-                        );
-                }
-                TokenType::Input => {
-                    BfInterpreter::put_char_from_input_to_mem(
-                        &mut self.input, 
-                        &mut self.memory, self.memory_ptr
-                        );
-                }
-
-                TokenType::Output => {
-                    BfInterpreter::join_output_char_to_str(
-                        self.memory.get(self.memory_ptr as usize)
-                        .and_then(|i| std::char::from_u32(*i)),
-                        &mut self.output);
-                }
-            }
-            self.token_ptr += 1;
-        }
     }
 
     //fn for token '+'.
@@ -214,14 +131,93 @@ impl BfInterpreter{
     }
 }
 
+
+struct BfInterpreter{
+    token_array : Vec<Token>,
+    token_ptr : u32,
+    memory : Vec<u32>,
+    memory_ptr: u16,
+    input : VecDeque<char>,
+    output : String,
+    loop_start_end_token_ptr_map : HashMap<u32,u32>,
+    loop_end_start_token_ptr_map : HashMap<u32,u32>,
+}
+
+impl BfInterpreter{
+    fn init(src: &str, input: &str) -> BfInterpreter {
+        let ta = Token::tokenize_from_array(src.chars().collect::<Vec<char>>());
+        let (lsetpm,lestpm) = Token::get_loop_token_ptr(&ta);
+
+        BfInterpreter{
+            token_array : ta,
+            token_ptr : 0,
+            //Brainf*ck's number of memory cell is defined to be larger than 30,000.
+            //So this program should reserve size of u16::max_value(), 
+            //which is expected to be 2^16 = 65,536.
+            memory : vec![0 ; u16::max_value() as usize],
+            memory_ptr : 0,
+            input : input.chars().collect(),
+            output : String::from(""),
+            loop_start_end_token_ptr_map : lsetpm,
+            loop_end_start_token_ptr_map : lestpm,
+        }
+    }
+
+    fn exec(&mut self){
+        let token_array = &self.token_array;
+        while let Some(token) = token_array.get(self.token_ptr as usize){
+            match *token{
+                Token::Inc => {
+                    Token::inc_mem_val(&mut self.memory, self.memory_ptr);
+                }
+                Token::Dec => {
+                    Token::dec_mem_val(&mut self.memory, self.memory_ptr);
+                }
+                Token::IncPtr => {
+                    Token::inc_mem_ptr(&mut self.memory_ptr);
+                }
+                Token::DecPtr => {
+                    Token::dec_mem_ptr(&mut self.memory_ptr);
+                }
+                Token::StartLoop => {
+                    Token::jump_loop_end_token_if_mem_0(
+                        self.memory.get(self.memory_ptr as usize),
+                        &self.loop_start_end_token_ptr_map,
+                        &mut self.token_ptr
+                        );
+                }
+                Token::EndLoop => {
+                    Token::jump_loop_start_token_if_mem_not_0(
+                        self.memory.get(self.memory_ptr as usize),
+                        &self.loop_end_start_token_ptr_map,
+                        &mut self.token_ptr
+                        );
+                }
+                Token::Input => {
+                    Token::put_char_from_input_to_mem(
+                        &mut self.input, 
+                        &mut self.memory, self.memory_ptr
+                        );
+                }
+
+                Token::Output => {
+                    Token::join_output_char_to_str(
+                        self.memory.get(self.memory_ptr as usize)
+                        .and_then(|i| std::char::from_u32(*i)),
+                        &mut self.output);
+                }
+            }
+            self.token_ptr += 1;
+        }
+    }
+}
+
 fn main (){
     let src: &str = 
         "+++++++++[>++++++++>+++++++++++>+++++<<<-]>.>++.+++++++..+++.>-.
         ------------.<++++++++.--------.+++.------.--------.>+.";
-        //"+++++++++++++++++++++++++++++++++.";
     let input : &str = "";
     let mut  bf = BfInterpreter::init(src, input);
-    //println!("start_end:{:?},end_start:{:?}",bf.loop_start_end_token_ptr_map,bf.loop_end_start_token_ptr_map);
     bf.exec();
     println!("{}",bf.output);
 }
