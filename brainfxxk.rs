@@ -28,10 +28,8 @@ impl Token{
 
     fn tokenize_from_array(char_array: Vec<char>)->Vec<Token>{
         let mut token_array: Vec<Token> = Vec::new();
-        for c in char_array{
-            if let Some(token) = Token::tokenize(c){
-                token_array.push(token);
-            }
+        for token in char_array.iter().filter_map(|c| Token::tokenize(*c)){
+            token_array.push(token);
         }
         return token_array;
     }
@@ -52,7 +50,7 @@ impl Token{
                         start_end_map.insert(start_ptr, ptr);
                         end_start_map.insert(ptr, start_ptr);
                     }else{
-                        panic!("Too many ']' tokens detected!");
+                        panic!("Too many `]` tokens detected!");
                     }
                 },
                 _ => {}
@@ -60,7 +58,7 @@ impl Token{
             ptr+=1;
         }
         if ! start_ptr_stack.is_empty(){
-            panic!("Too many '[' tokens detected!");
+            panic!("Too many `[` tokens detected!");
         }
         return (start_end_map, end_start_map);
     }
@@ -96,7 +94,7 @@ impl Token{
         if let Some(end_ptr) = loop_start_end_token_ptr_map.get(token_ptr){
             *token_ptr = *end_ptr;
         }else{
-            panic!("no pair ']' token found.");
+            panic!("no pair `]` token found.");
         }
     }
     //fn for token `]`.
@@ -110,7 +108,7 @@ impl Token{
         if let Some(start_ptr) = loop_end_start_token_ptr_map.get(token_ptr){
             *token_ptr = *start_ptr;
         }else{
-            panic!("no pair '[' token found.");
+            panic!("no pair `[` token found.");
         }
     }
     //fn for token `,`.
@@ -153,7 +151,7 @@ impl BfInterpreter{
             token_ptr : 0,
             //Brainf*ck's number of memory cell is defined to be larger than 30,000.
             //So this program should reserve size of `u16::max_value()`, 
-            //which is expected to be 2^16 = 65,536.
+            //which is expected to be 2^16 - 1 = 65,535.
             memory : vec![0 ; u16::max_value() as usize],
             memory_ptr : 0,
             input : input.chars().collect(),
