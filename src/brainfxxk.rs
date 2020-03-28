@@ -142,7 +142,7 @@ pub struct BfInterpreter{
 }
 
 impl BfInterpreter{
-    pub fn init(src: &str, input: &str) -> BfInterpreter {
+    pub fn new(src: &str, input: &str) -> BfInterpreter {
         let ta = Token::tokenize_from_array(src.chars().collect::<Vec<char>>());
         let (lsetpm,lestpm) = Token::get_loop_token_ptr(&ta);
 

@@ -7,7 +7,7 @@ fn hello_world() {
         "+++++++++[>++++++++>+++++++++++>+++++<<<-]>.>++.+++++++..+++.>-.
         ------------.<++++++++.--------.+++.------.--------.>+.";
     let input : &str = "";
-    let mut  bf = brainfxxk::BfInterpreter::init(src, input);
+    let mut  bf = brainfxxk::BfInterpreter::new(src, input);
     bf.exec();
     assert_eq!(bf.output(), "Hello, world!");
 }

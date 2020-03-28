@@ -5,7 +5,7 @@ fn main (){
         "+++++++++[>++++++++>+++++++++++>+++++<<<-]>.>++.+++++++..+++.>-.
         ------------.<++++++++.--------.+++.------.--------.>+.";
     let input : &str = "";
-    let mut  bf = brainfxxk::BfInterpreter::init(src, input);
+    let mut  bf = brainfxxk::BfInterpreter::new(src, input);
     bf.exec();
     println!("{}",bf.output());
 }
