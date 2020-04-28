@@ -1,12 +1,10 @@
-name: Rust
+name: Build on macOS
 
 on: [push]
 
 jobs:
   build:
-
-    runs-on: windows-latest
-
+    runs-on: macos-latest
     steps:
     - uses: actions/checkout@v1
     - name: Build
