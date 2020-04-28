@@ -12,12 +12,9 @@ see the example code below:
 
 ```rust
 use brainfxxk::bf_interpreter::*;
-
-fn hello_world() {
-    let src = "+++++++++[>++++++++>+++++++++++>+++++<<<-]>.>++.+++++++..+++.>-.------------.<++++++++.--------.+++.------.--------.>+.";
-    let input = "";
-    let mut bf = BfInterpreter::new(src, input);
-    bf.exec();
-    assert_eq!(bf.output(), "Hello, world!");
-}
+let src = "+++++++++[>++++++++>+++++++++++>+++++<<<-]>.>++.+++++++..+++.>-.------------.<++++++++.--------.+++.------.--------.>+.";
+let input = "";
+let mut bf = BfInterpreter::new(src, input);
+bf.exec();
+assert_eq!(bf.output(), "Hello, world!");
 ```

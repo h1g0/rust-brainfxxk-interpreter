@@ -3,6 +3,17 @@ use std::collections::HashMap;
 use std::collections::VecDeque;
 
 /// Brainf*ck interpreter
+/// 
+/// # Examples
+/// 
+/// ```
+/// use brainfxxk::bf_interpreter::*;
+/// let src = "+++++++++[>++++++++>+++++++++++>+++++<<<-]>.>++.+++++++..+++.>-.------------.<++++++++.--------.+++.------.--------.>+.";
+/// let input = "";
+/// let mut bf = BfInterpreter::new(src, input);
+/// bf.exec();
+/// assert_eq!(bf.output(), "Hello, world!");
+/// ```
 pub struct BfInterpreter {
     token_array: Vec<Token>,
     token_ptr: u32,
