@@ -1,6 +1,6 @@
 [package]
-name = "rust-brainfxxk-interpreter"
-version = "0.3.0"
+name = "brainfxxk"
+version = "0.4.0"
 authors = ["hi_go <me@clutte.red>"]
 edition = "2018"
 

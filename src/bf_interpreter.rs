@@ -142,6 +142,7 @@ impl Token {
     }
 }
 
+/// Brainf*ck interpreter
 pub struct BfInterpreter {
     token_array: Vec<Token>,
     token_ptr: u32,
@@ -152,8 +153,18 @@ pub struct BfInterpreter {
     loop_start_end_token_ptr_map: HashMap<u32, u32>,
     loop_end_start_token_ptr_map: HashMap<u32, u32>,
 }
-
 impl BfInterpreter {
+
+    /// creates new `BfInterpreter`
+    /// 
+    /// # Arguments
+    /// 
+    /// * `src` - source code to execute
+    /// * `input` - input
+    /// # Returns
+    /// 
+    /// `BfInterpreter`
+    /// 
     pub fn new(src: &str, input: &str) -> BfInterpreter {
         let ta = Token::tokenize_from_array(src.chars().collect::<Vec<char>>());
         let (lsetpm, lestpm) = Token::get_loop_token_ptr(&ta);
@@ -173,6 +184,7 @@ impl BfInterpreter {
         }
     }
 
+    /// executes the source code
     pub fn exec(&mut self) {
         let token_array = &self.token_array;
         while let Some(token) = token_array.get(self.token_ptr as usize) {
@@ -224,7 +236,21 @@ impl BfInterpreter {
         }
     }
 
+    /// returns result
     pub fn output(&self) -> &str {
         return &self.output;
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn hello_world() {
+        let src: &str = "+++++++++[>++++++++>+++++++++++>+++++<<<-]>.>++.+++++++..+++.>-.------------.<++++++++.--------.+++.------.--------.>+.";
+        let input: &str = "";
+        let mut bf = BfInterpreter::new(src, input);
+        bf.exec();
+        assert_eq!(bf.output(), "Hello, world!");
     }
 }

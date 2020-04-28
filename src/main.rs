@@ -1,10 +1,10 @@
-mod brainfxxk;
+use brainfxxk::bf_interpreter::*;
 
 fn main() {
     let src: &str = "+++++++++[>++++++++>+++++++++++>+++++<<<-]>.>++.+++++++..+++.>-.
         ------------.<++++++++.--------.+++.------.--------.>+.";
     let input: &str = "";
-    let mut bf = brainfxxk::BfInterpreter::new(src, input);
+    let mut bf = BfInterpreter::new(src, input);
     bf.exec();
     println!("{}", bf.output());
 }
