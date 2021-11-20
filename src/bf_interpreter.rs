@@ -1,3 +1,4 @@
+use anyhow::Result;
 use crate::token::*;
 use std::collections::HashMap;
 use std::collections::VecDeque;
@@ -36,11 +37,11 @@ impl BfInterpreter {
     /// 
     /// `BfInterpreter`
     /// 
-    pub fn new(src: &str, input: &str) -> BfInterpreter {
+    pub fn new(src: &str, input: &str) -> Result<BfInterpreter> {
         let ta = Token::tokenize_from_array(src.chars().collect::<Vec<char>>());
-        let (lsetpm, lestpm) = Token::get_loop_token_ptr(&ta);
+        let (lsetpm, lestpm) = Token::get_loop_token_ptr(&ta)?;
 
-        BfInterpreter {
+        Ok(BfInterpreter {
             token_array: ta,
             token_ptr: 0,
             //Brainf*ck's number of memory cell is defined to be larger than 30,000.
@@ -52,11 +53,11 @@ impl BfInterpreter {
             output: String::from(""),
             loop_start_end_token_ptr_map: lsetpm,
             loop_end_start_token_ptr_map: lestpm,
-        }
+        })
     }
 
     /// executes the source code
-    pub fn exec(&mut self) {
+    pub fn exec(&mut self)-> Result<()> {
         let token_array = &self.token_array;
         while let Some(token) = token_array.get(self.token_ptr as usize) {
             match *token {
@@ -77,7 +78,7 @@ impl BfInterpreter {
                         self.memory.get(self.memory_ptr as usize),
                         &self.loop_start_end_token_ptr_map,
                         &mut self.token_ptr,
-                    );
+                    )?;
                 }
                 Token::EndLoop => {
                     Token::jump_loop_start_token_if_mem_not_0(
@@ -105,6 +106,7 @@ impl BfInterpreter {
             }
             self.token_ptr += 1;
         }
+        Ok(())
     }
 
     /// returns result
@@ -120,8 +122,8 @@ mod test {
     fn hello_world() {
         let src = "+++++++++[>++++++++>+++++++++++>+++++<<<-]>.>++.+++++++..+++.>-.------------.<++++++++.--------.+++.------.--------.>+.";
         let input = "";
-        let mut bf = BfInterpreter::new(src, input);
-        bf.exec();
+        let mut bf = BfInterpreter::new(src, input).unwrap();
+        bf.exec().unwrap();
         assert_eq!(bf.output(), "Hello, world!");
     }
 }

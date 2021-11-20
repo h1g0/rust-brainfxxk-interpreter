@@ -1,3 +1,6 @@
+use anyhow::Result;
+use anyhow::anyhow;
+
 use std::collections::HashMap;
 use std::collections::VecDeque;
 
@@ -35,7 +38,7 @@ impl Token {
         return token_array;
     }
 
-    pub fn get_loop_token_ptr(token_array: &Vec<Token>) -> (HashMap<u32, u32>, HashMap<u32, u32>) {
+    pub fn get_loop_token_ptr(token_array: &Vec<Token>) -> Result<(HashMap<u32, u32>, HashMap<u32, u32>)> {
         let mut start_end_map: HashMap<u32, u32> = HashMap::new();
         let mut end_start_map: HashMap<u32, u32> = HashMap::new();
         let mut start_ptr_stack: Vec<u32> = Vec::new();
@@ -50,7 +53,7 @@ impl Token {
                         start_end_map.insert(start_ptr, ptr);
                         end_start_map.insert(ptr, start_ptr);
                     } else {
-                        panic!("Too many `]` tokens detected!");
+                        return Err(anyhow!("Too many `]` tokens detected!"));
                     }
                 }
                 _ => {}
@@ -58,9 +61,9 @@ impl Token {
             ptr += 1;
         }
         if !start_ptr_stack.is_empty() {
-            panic!("Too many `[` tokens detected!");
+            return Err(anyhow!("Too many `[` tokens detected!"));
         }
-        return (start_end_map, end_start_map);
+        Ok((start_end_map, end_start_map))
     }
 
     //fn for token `+`.
@@ -88,19 +91,20 @@ impl Token {
         mem_val: Option<&u32>,
         loop_start_end_token_ptr_map: &HashMap<u32, u32>,
         token_ptr: &mut u32,
-    ) {
+    ) -> Result<()>{
         if let Some(val) = mem_val {
             if *val != 0 {
-                return;
+                return Ok(());
             }
         } else {
-            return;
+            return Ok(());
         }
 
         if let Some(end_ptr) = loop_start_end_token_ptr_map.get(token_ptr) {
             *token_ptr = *end_ptr;
+            Ok(())
         } else {
-            panic!("no pair `]` token found.");
+            return Err(anyhow!("no pair `]` token found."));
         }
     }
     //fn for token `]`.
