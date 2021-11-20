@@ -1,6 +1,6 @@
 [package]
 name = "brainfxxk"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["hi_go <me@clutte.red>"]
 edition = "2021"
 

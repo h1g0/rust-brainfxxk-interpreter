@@ -14,7 +14,7 @@ see the example code below:
 use brainfxxk::bf_interpreter::*;
 let src = "+++++++++[>++++++++>+++++++++++>+++++<<<-]>.>++.+++++++..+++.>-.------------.<++++++++.--------.+++.------.--------.>+.";
 let input = "";
-let mut bf = BfInterpreter::new(src, input);
-bf.exec();
+let mut bf = BfInterpreter::new(src, input).unwrap();
+bf.exec().unwrap();
 assert_eq!(bf.output(), "Hello, world!");
 ```

@@ -10,7 +10,7 @@ checksum = "38d9ff5d688f1c13395289f67db01d4826b46dd694e7580accdc3e8430f2d98e"
 
 [[package]]
 name = "brainfxxk"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
 ]
